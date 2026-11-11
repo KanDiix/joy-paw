@@ -1,0 +1,12 @@
+{
+  "backHome": "Back to home",
+  "generic": {
+    "title": "Something went wrong",
+    "message": "The page could not be displayed. Try again in a moment.",
+    "retry": "Retry"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "message": "This page does not exist."
+  }
+}

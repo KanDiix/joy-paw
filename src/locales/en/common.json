@@ -1,0 +1,15 @@
+{
+  "layout": {
+    "appName": "FunLand",
+    "mainNavigation": "Main navigation",
+    "nav": {
+      "home": "Home",
+      "about": "About"
+    },
+    "language": {
+      "label": "Language",
+      "en": "English",
+      "fr": "Français"
+    }
+  }
+}

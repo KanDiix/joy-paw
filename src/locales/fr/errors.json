@@ -1,0 +1,12 @@
+{
+  "backHome": "Retour à l'accueil",
+  "generic": {
+    "title": "Une erreur est survenue",
+    "message": "La page n'a pas pu être affichée. Réessayez dans un instant.",
+    "retry": "Réessayer"
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "message": "Cette page n'existe pas."
+  }
+}
