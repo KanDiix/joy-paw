@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Redirecting…</title>
+  <!--
+    GitHub Pages SPA fallback, copied to the root of the gh-pages branch by the CI.
+    GitHub Pages serves this file for any unknown path. It sends the browser to the root of the
+    right environment (prod, /dev/ or /uat/) with the requested path in `?redirect=`, which
+    `src/routes/restoreRedirectedPath.ts` puts back in the address bar.
+  -->
+  <script>
+    (function () {
+      var ENVIRONMENT_DIRS = ['dev', 'uat'];
+      var segments = window.location.pathname.split('/');
+      // On <user>.github.io/<repo>/ the first segment is the repository; on a custom domain there is none.
+      var baseLength = window.location.hostname.endsWith('.github.io') ? 2 : 1;
+      if (ENVIRONMENT_DIRS.indexOf(segments[baseLength]) !== -1) {
+        baseLength += 1;
+      }
+      var base = segments.slice(0, baseLength).join('/') + '/';
+      var path = '/' + segments.slice(baseLength).join('/');
+      window.location.replace(base + '?redirect=' + encodeURIComponent(path + window.location.search + window.location.hash));
+    })();
+  </script>
+</head>
+
+<body></body>
+
+</html>
