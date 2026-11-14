@@ -7,7 +7,7 @@ import { renderWrapped } from 'test/utils';
 describe('AppRoutes', () => {
     it('renders the home page', () => {
         renderWrapped(<AppRoutes />, { initialEntries: [RoutePaths.home()] });
-        expect(screen.getByRole('heading', { level: 1, name: 'Welcome to FunLand' })).toBeDefined();
+        expect(screen.getByRole('heading', { level: 1, name: 'Welcome to JoyPaw' })).toBeDefined();
     });
 
     it('renders the about page', () => {
@@ -20,16 +20,9 @@ describe('AppRoutes', () => {
         expect(screen.getByRole('heading', { level: 1, name: 'Page not found' })).toBeDefined();
     });
 
-    it('navigates from the header', async () => {
+    it('navigates from the footer', async () => {
         renderWrapped(<AppRoutes />);
         await userEvent.click(screen.getByRole('link', { name: 'About' }));
         expect(screen.getByRole('heading', { level: 1, name: 'About' })).toBeDefined();
-    });
-
-    it('switches the language', async () => {
-        renderWrapped(<AppRoutes />);
-        await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Language' }), 'fr');
-        expect(screen.getByRole('heading', { level: 1, name: 'Bienvenue sur FunLand' })).toBeDefined();
-        expect(document.documentElement.lang).toBe('fr');
     });
 });

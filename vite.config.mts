@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vitest/config';
+import { contentSecurityPolicyPlugin } from './src/config/contentSecurityPolicyPlugin.ts';
 import { i18nResourcesPlugin } from './src/config/i18n/i18nResourcesPlugin.ts';
 
 // Forward slashes so aliased paths stay valid ids on Windows too.
@@ -21,6 +22,7 @@ export default defineConfig(({ mode }) => ({
     plugins: [
         react(),
         i18nResourcesPlugin(resolve(srcDir, 'locales')),
+        contentSecurityPolicyPlugin(),
         mode === 'analyze' && visualizer({ filename: 'dist/stats.html', open: true, gzipSize: true }),
     ],
     resolve: {
@@ -31,7 +33,7 @@ export default defineConfig(({ mode }) => ({
         ],
     },
     server: {
-        port: 3000,
+        port: 1307,
         open: true,
     },
     build: {
@@ -39,14 +41,14 @@ export default defineConfig(({ mode }) => ({
     },
     test: {
         environment: 'happy-dom',
-        environmentOptions: { happyDOM: { url: 'http://localhost:3000' } },
+        environmentOptions: { happyDOM: { url: 'http://localhost:1307' } },
         globals: true,
         setupFiles: ['src/test/index.ts'],
         include: ['src/**/*.spec.{ts,tsx}'],
         coverage: {
             provider: 'v8',
             include: ['src/**/*.{ts,tsx}'],
-            exclude: ['src/**/*.spec.{ts,tsx}', 'src/test/**', 'src/config/i18n/i18nResourcesPlugin.ts', 'src/typings.d.ts'],
+            exclude: ['src/**/*.spec.{ts,tsx}', 'src/test/**', 'src/config/i18n/i18nResourcesPlugin.ts', 'src/config/contentSecurityPolicyPlugin.ts', 'src/typings.d.ts'],
         },
     },
 }));

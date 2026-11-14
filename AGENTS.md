@@ -1,4 +1,4 @@
-# FunLand Project Guide
+# JoyPaw Project Guide
 
 ## Project overview
 
@@ -6,7 +6,7 @@
 
 ## Current scope
 
-FunLand is a **public** site: no authentication and no API calls for now. It has two pages, Home and About, plus a "not found" fallback. The site is translated into English and French.
+JoyPaw is a **public** site: no authentication and no API calls for now. It has two pages, Home and About, plus a "not found" fallback. The site is translated into English and French.
 
 Several building blocks are planned but deliberately not implemented yet: API calls, authentication and logging. Each one already has its file in the tree, empty except for a comment that says what it will do (see [Planned building blocks](#planned-building-blocks)). Keep these files as placeholders and don't implement them unless you are asked to. When you do implement one, add its dependencies at the same time, not before.
 
@@ -126,6 +126,32 @@ Principles to keep in mind now, so that adding these later stays cheap:
 
 `isDebugEnvironment()` is the switch for debug tooling, and later for verbose logging.
 
+## Branches, CI and deployment
+
+The project follows git flow: `main` is what is in production, `develop` is the base of all development, and work happens on `feature/*`, `release/*` and `hotfix/*` branches.
+
+`.github/workflows/ci.yml` runs `typecheck`, `lint`, `test` and a build on every push and on pull requests to `main` and `develop`. When those pass, it deploys some branches to GitHub Pages (one site per repository, so each environment gets a folder of the `gh-pages` branch):
+
+| Branch                  | Environment | URL                                     |
+| ----------------------- | ----------- | --------------------------------------- |
+| `main`                  | `prod`      | `https://<owner>.github.io/<repo>/`     |
+| `develop`               | `dev`       | `https://<owner>.github.io/<repo>/dev/` |
+| `release/*`, `hotfix/*` | `uat`       | `https://<owner>.github.io/<repo>/uat/` |
+
+- The hostname is the same for every environment, so the CI sets `VITE_ENVIRONMENT` for each build.
+- The app is served under a sub-path, so the build gets `--base` and `BrowserRouter` uses `import.meta.env.BASE_URL` as its `basename`. Keep internal URLs relative to the router (`RoutePaths`, `Link`) and reference static assets through Vite, never as hardcoded absolute paths.
+- GitHub Pages has no SPA fallback. `.github/pages/404.html` (copied to the root of `gh-pages`) redirects unknown paths to the right environment with `?redirect=`, and `routes/restoreRedirectedPath` restores the path before the router starts.
+
+Dependency updates: `.github/dependabot.yml` opens pull requests against `develop` every Monday. Minor and patch updates (npm, then GitHub Actions) are grouped into one PR per ecosystem, each major npm update gets its own PR, and a version must be at least 7 days old to be proposed.
+
+Releases: `git flow release finish <x.y.z>` tags `main`. Pushing the tag runs `.github/workflows/release.yml`, which creates a GitHub Release with generated notes and the production build (base `/`) as a zip. Bump `package.json` on the release branch (`yarn version <x.y.z>`) so that it matches the tag; the workflow warns otherwise.
+
+## Security
+
+- Everything shipped to the browser is public, including every `VITE_*` variable. Never put a secret in the front end; CI secrets live in GitHub Actions secrets and are never passed to the build.
+- XSS: React escapes what it renders, so never bypass it. `dangerouslySetInnerHTML` and `javascript:` URLs are lint errors.
+- Production builds carry a Content Security Policy (`config/contentSecurityPolicyPlugin.ts`, injected as a `<meta>` tag because GitHub Pages cannot send headers; not applied by the dev server). Only same-origin scripts, styles, fonts and requests are allowed. When the app needs a new origin (API, fonts, analytics), add it to the policy and check the result with `yarn build && yarn preview`, since `yarn start` does not apply it.
+
 ## Code conventions
 
 - Type component props with a `type` alias, not an `interface` (enforced by ESLint). Mark optional props with `?`.
@@ -148,7 +174,7 @@ Principles to keep in mind now, so that adding these later stays cheap:
 
 ```
 yarn              # install (Yarn 4, pinned in .yarn/releases — no global install needed beyond Yarn itself)
-yarn start        # dev server (Vite, port 3000)
+yarn start        # dev server (Vite, port 1307)
 yarn typecheck    # tsc -b
 yarn lint         # eslint src --max-warnings=0
 yarn lint:fix

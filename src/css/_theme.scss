@@ -1,0 +1,218 @@
+// JoyPaw brand tokens, plus the Bootstrap variables they override and the brand buttons.
+// Contrast (WCAG AA): ink-muted on cream 6.2:1, on beige 5.6:1; white on sage-700 6.1:1; ink on gold 9:1.
+
+:root {
+    --jp-ink: #1f2622;
+    --jp-ink-muted: #545f58;
+    --jp-sage-50: #f1f5ef;
+    --jp-sage-100: #e3ece2;
+    --jp-sage-500: #7a9e80;
+    --jp-sage-700: #3f6b4f;
+    --jp-sage-800: #2f5440;
+    --jp-cream: #fbf9f5;
+    --jp-beige: #f3ede2;
+    --jp-gold: #e8c26a;
+    --jp-gold-100: #f8ecce;
+    --jp-gold-800: #6b4e12;
+
+    --jp-line: rgb(31 38 34 / 0.08);
+    --jp-shadow-sm: 0 1px 2px rgb(31 38 34 / 0.06), 0 1px 1px rgb(31 38 34 / 0.04);
+    --jp-shadow-lg: 0 24px 48px -24px rgb(31 38 34 / 0.28), 0 4px 12px rgb(31 38 34 / 0.05);
+    --jp-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    --bs-body-bg: var(--jp-cream);
+    --bs-body-color: var(--jp-ink);
+    --bs-emphasis-color: var(--jp-ink);
+    --bs-heading-color: var(--jp-ink);
+    --bs-focus-ring-color: rgb(63 107 79 / 0.35);
+}
+
+// Visible on keyboard focus only, for every brand control.
+.brand-logo,
+.site-nav__link,
+.site-footer__link,
+.menu-toggle,
+.menu-drawer__link,
+.skip-link {
+    &:focus-visible {
+        outline: 2px solid var(--jp-sage-700);
+        outline-offset: 3px;
+    }
+}
+
+.skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 1100;
+    padding: 0.625rem 1rem;
+    border-radius: 0.75rem;
+    background: var(--jp-ink);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    transform: translateY(-200%);
+
+    &:focus-visible {
+        transform: none;
+    }
+}
+
+main:focus {
+    outline: none;
+}
+
+// ---- Logo ----------------------------------------------------------------------------------------
+
+.brand-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    border-radius: 0.75rem;
+    color: var(--jp-ink);
+    font-size: 1.25rem;
+    font-weight: 650;
+    letter-spacing: -0.025em;
+    text-decoration: none;
+
+    &:hover {
+        color: var(--jp-ink);
+    }
+
+    &:hover .brand-logo__mark {
+        transform: rotate(-8deg) scale(1.05);
+    }
+}
+
+.brand-logo__mark {
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    filter: drop-shadow(0 4px 8px rgb(47 84 64 / 0.25));
+    transition: transform 0.5s var(--jp-ease);
+}
+
+.brand-logo__accent {
+    color: var(--jp-sage-700);
+}
+
+// ---- Buttons (Bootstrap .btn driven through its CSS variables) ----------------------------------
+
+%btn-joy-base {
+    --bs-btn-padding-x: 1.125rem;
+    --bs-btn-padding-y: 0.5625rem;
+    --bs-btn-font-weight: 600;
+    --bs-btn-font-size: 0.9375rem;
+    --bs-btn-border-radius: 999px;
+    --bs-btn-focus-shadow-rgb: 63, 107, 79;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    transition:
+        color 0.2s,
+        background-color 0.2s,
+        border-color 0.2s,
+        box-shadow 0.25s var(--jp-ease),
+        transform 0.25s var(--jp-ease);
+
+    &.btn-lg {
+        --bs-btn-padding-x: 1.5rem;
+        --bs-btn-padding-y: 0.75rem;
+        --bs-btn-font-size: 1rem;
+        --bs-btn-border-radius: 999px;
+    }
+
+    &:hover .btn-joy__arrow {
+        transform: translateX(3px);
+    }
+}
+
+.btn-joy__arrow {
+    flex-shrink: 0;
+    transition: transform 0.25s var(--jp-ease);
+}
+
+.btn-joy {
+    @extend %btn-joy-base;
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--jp-sage-700);
+    --bs-btn-border-color: var(--jp-sage-700);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--jp-sage-800);
+    --bs-btn-hover-border-color: var(--jp-sage-800);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--jp-sage-800);
+    --bs-btn-active-border-color: var(--jp-sage-800);
+
+    background-image: linear-gradient(180deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0));
+    box-shadow:
+        0 6px 16px -8px rgb(47 84 64 / 0.6),
+        inset 0 1px 0 rgb(255 255 255 / 0.18);
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow:
+            0 12px 24px -10px rgb(47 84 64 / 0.6),
+            inset 0 1px 0 rgb(255 255 255 / 0.18);
+    }
+}
+
+.btn-joy-gold {
+    @extend %btn-joy-base;
+    --bs-btn-color: var(--jp-ink);
+    --bs-btn-bg: var(--jp-gold);
+    --bs-btn-border-color: var(--jp-gold);
+    --bs-btn-hover-color: var(--jp-ink);
+    --bs-btn-hover-bg: #efcf86;
+    --bs-btn-hover-border-color: #efcf86;
+    --bs-btn-active-color: var(--jp-ink);
+    --bs-btn-active-bg: #efcf86;
+    --bs-btn-active-border-color: #efcf86;
+    --bs-btn-focus-shadow-rgb: 232, 194, 106;
+
+    box-shadow: 0 10px 24px -10px rgb(0 0 0 / 0.35);
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 32px -12px rgb(0 0 0 / 0.4);
+    }
+}
+
+.btn-joy-ghost {
+    @extend %btn-joy-base;
+    --bs-btn-color: var(--jp-ink);
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: transparent;
+    --bs-btn-hover-color: var(--jp-ink);
+    --bs-btn-hover-bg: rgb(63 107 79 / 0.08);
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-active-color: var(--jp-ink);
+    --bs-btn-active-bg: rgb(63 107 79 / 0.12);
+    --bs-btn-active-border-color: transparent;
+}
+
+.btn-joy-outline {
+    @extend %btn-joy-base;
+    --bs-btn-color: var(--jp-ink);
+    --bs-btn-bg: #fff;
+    --bs-btn-border-color: var(--jp-line);
+    --bs-btn-hover-color: var(--jp-ink);
+    --bs-btn-hover-bg: var(--jp-sage-50);
+    --bs-btn-hover-border-color: var(--jp-sage-100);
+    --bs-btn-active-color: var(--jp-ink);
+    --bs-btn-active-bg: var(--jp-sage-100);
+    --bs-btn-active-border-color: var(--jp-sage-100);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after,
+    *::backdrop {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}

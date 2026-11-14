@@ -1,0 +1,48 @@
+# Turns a version tag into a GitHub Release with the production build attached.
+# `git flow release finish <version>` creates the tag on main; push it with `git push --tags`.
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+      - '[0-9]+.[0-9]+.[0-9]+*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+
+      - name: Check that package.json matches the tag
+        shell: bash
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [ "$version" != "${GITHUB_REF_NAME#v}" ]; then
+            echo "::warning::package.json says $version but the tag is $GITHUB_REF_NAME. Run 'yarn version <x.y.z>' on the release branch."
+          fi
+
+      - run: yarn typecheck
+      - run: yarn lint
+      - run: yarn test
+
+      # Built for the root of a domain, so the archive can be served by any host as is.
+      - name: Build
+        env:
+          VITE_ENVIRONMENT: prod
+        run: yarn vite build --mode production
+
+      - name: Create the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          archive="${REPO_NAME}-${GITHUB_REF_NAME}.zip"
+          (cd dist && zip -r "../$archive" .)
+          gh release create "$GITHUB_REF_NAME" "$archive" --title "$GITHUB_REF_NAME" --generate-notes --verify-tag

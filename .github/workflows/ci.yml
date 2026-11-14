@@ -1,0 +1,121 @@
+# Checks every branch, then deploys the git flow branches to GitHub Pages:
+#   main                  -> prod  https://<user>.github.io/<repo>/
+#   develop               -> dev   https://<user>.github.io/<repo>/dev/
+#   release/*, hotfix/*   -> uat   https://<user>.github.io/<repo>/uat/
+# feature/* branches are only checked.
+name: CI
+
+on:
+  push:
+    # Dependabot branches are checked through their pull request only.
+    branches: ['**', '!dependabot/**']
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck, lint, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+      - run: yarn typecheck
+      - run: yarn lint
+      - run: yarn test
+      - run: yarn vite build --mode production
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: verify
+    if: >-
+      github.event_name != 'pull_request' && (
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/develop' ||
+        startsWith(github.ref, 'refs/heads/release/') ||
+        startsWith(github.ref, 'refs/heads/hotfix/')
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # Every deployment rewrites the same gh-pages branch: run them one at a time, never cancel one halfway.
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+
+      - name: Resolve the target environment
+        id: target
+        shell: bash
+        run: |
+          case "$GITHUB_REF_NAME" in
+            main)                  echo "environment=prod" >> "$GITHUB_OUTPUT"; echo "dir="    >> "$GITHUB_OUTPUT"; echo "mode=production"  >> "$GITHUB_OUTPUT" ;;
+            develop)               echo "environment=dev"  >> "$GITHUB_OUTPUT"; echo "dir=dev" >> "$GITHUB_OUTPUT"; echo "mode=development" >> "$GITHUB_OUTPUT" ;;
+            release/*|hotfix/*)    echo "environment=uat"  >> "$GITHUB_OUTPUT"; echo "dir=uat" >> "$GITHUB_OUTPUT"; echo "mode=production"  >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::No environment for $GITHUB_REF_NAME"; exit 1 ;;
+          esac
+
+      - name: Build
+        shell: bash
+        env:
+          VITE_ENVIRONMENT: ${{ steps.target.outputs.environment }}
+          TARGET_DIR: ${{ steps.target.outputs.dir }}
+          MODE: ${{ steps.target.outputs.mode }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          base="/${REPO_NAME}/${TARGET_DIR:+$TARGET_DIR/}"
+          echo "Building $VITE_ENVIRONMENT ($MODE) with base $base"
+          yarn vite build --mode "$MODE" --base "$base"
+
+      - name: Publish to the gh-pages branch
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_DIR: ${{ steps.target.outputs.dir }}
+          ENVIRONMENT: ${{ steps.target.outputs.environment }}
+        run: |
+          set -euo pipefail
+          remote="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          if git ls-remote --exit-code --heads "$remote" gh-pages > /dev/null; then
+            git clone --depth 1 --branch gh-pages "$remote" site
+          else
+            git init --initial-branch gh-pages site
+            git -C site remote add origin "$remote"
+          fi
+
+          # Replace only this environment's files; prod (root) keeps the dev/ and uat/ folders.
+          if [ -z "$TARGET_DIR" ]; then
+            find site -mindepth 1 -maxdepth 1 ! -name .git ! -name dev ! -name uat -exec rm -rf {} +
+          else
+            rm -rf "site/$TARGET_DIR"
+          fi
+          mkdir -p "site/$TARGET_DIR"
+          cp -r dist/. "site/$TARGET_DIR"
+
+          # Site-wide files, whichever environment is deployed first.
+          cp .github/pages/404.html site/404.html
+          touch site/.nojekyll
+
+          cd site
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --all
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git commit --message "Deploy $ENVIRONMENT from $GITHUB_REF_NAME@${GITHUB_SHA::7}"
+          git push origin gh-pages
+
+          url="https://${GITHUB_REPOSITORY_OWNER,,}.github.io/${GITHUB_REPOSITORY#*/}/${TARGET_DIR:+$TARGET_DIR/}"
+          echo "### Deployed $ENVIRONMENT: $url" >> "$GITHUB_STEP_SUMMARY"

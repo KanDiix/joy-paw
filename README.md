@@ -1,4 +1,4 @@
-# FunLand
+# JoyPaw
 
 Public site built with React, TypeScript and Vite, available in English and French.
 
@@ -8,7 +8,7 @@ Requires Node 24+ and Yarn (any version: the project pins Yarn 4.18 in `.yarn/re
 
 ```
 yarn          # install
-yarn start    # dev server on http://localhost:3000
+yarn start    # dev server on http://localhost:1307
 ```
 
 Other commands: `yarn typecheck`, `yarn lint`, `yarn test`, `yarn build:prod`, `yarn preview`.

@@ -1,3 +1,6 @@
 // Only what Bootstrap utilities do not cover. Prefer utility classes over adding rules here.
 // Bootstrap's own CSS is imported precompiled in `boot-client.tsx` (no Sass compilation of Bootstrap).
+@use '~/css/theme';
+@use '~/css/header';
+@use '~/css/footer';
 @use '~/css/utilities';

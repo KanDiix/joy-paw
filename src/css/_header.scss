@@ -1,0 +1,219 @@
+// Sticky header and its mobile drawer (Header.tsx).
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background-color: var(--jp-cream);
+    border-bottom: 1px solid transparent;
+    transition:
+        background-color 0.35s var(--jp-ease),
+        border-color 0.35s var(--jp-ease),
+        box-shadow 0.35s var(--jp-ease);
+
+    &.is-scrolled {
+        background-color: rgb(251 249 245 / 0.78);
+        border-bottom-color: var(--jp-line);
+        box-shadow: 0 10px 30px -24px rgb(31 38 34 / 0.45);
+        backdrop-filter: saturate(160%) blur(14px);
+    }
+}
+
+.site-header__bar {
+    min-height: 4.5rem;
+    transition: min-height 0.35s var(--jp-ease);
+
+    .is-scrolled & {
+        min-height: 4rem;
+    }
+}
+
+// Desktop links: a soft pill on hover, and a golden dot rising under the label.
+.site-nav__link {
+    position: relative;
+    display: inline-flex;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    color: var(--jp-ink-muted);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+        color 0.2s,
+        background-color 0.25s var(--jp-ease);
+
+    &::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: 0.2rem;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--jp-gold);
+        opacity: 0;
+        transform: translate(-50%, 3px);
+        transition:
+            opacity 0.25s,
+            transform 0.3s var(--jp-ease);
+    }
+
+    &:hover,
+    &:focus-visible {
+        color: var(--jp-ink);
+        background-color: rgb(63 107 79 / 0.07);
+
+        &::after {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+    }
+}
+
+.menu-toggle {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid var(--jp-line);
+    border-radius: 0.875rem;
+    background: #fff;
+    color: var(--jp-ink);
+    box-shadow: var(--jp-shadow-sm);
+    transition:
+        background-color 0.2s,
+        transform 0.2s var(--jp-ease);
+
+    &:hover {
+        background: var(--jp-sage-50);
+    }
+
+    &:active {
+        transform: scale(0.96);
+    }
+}
+
+// ---- Mobile drawer (native <dialog>) ------------------------------------------------------------
+
+$drawer-duration: 0.4s;
+
+.menu-drawer {
+    // The dialog spans the viewport so that clicks outside the panel land on it (see Header.tsx).
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    overflow: hidden;
+    // Keeps the dialog rendered while it animates out.
+    transition:
+        display $drawer-duration allow-discrete,
+        overlay $drawer-duration allow-discrete;
+
+    &::backdrop {
+        background-color: rgb(31 38 34 / 0);
+        backdrop-filter: blur(0);
+        transition:
+            background-color $drawer-duration var(--jp-ease),
+            backdrop-filter $drawer-duration var(--jp-ease),
+            display $drawer-duration allow-discrete,
+            overlay $drawer-duration allow-discrete;
+    }
+
+    &[open]::backdrop {
+        background-color: rgb(31 38 34 / 0.32);
+        backdrop-filter: blur(3px);
+    }
+}
+
+.menu-drawer__panel {
+    display: flex;
+    flex-direction: column;
+    width: min(24rem, 100%);
+    height: 100%;
+    margin-left: auto;
+    padding: 1rem 1.25rem max(1.5rem, env(safe-area-inset-bottom));
+    overflow-y: auto;
+    background:
+        radial-gradient(120% 60% at 100% 0%, var(--jp-sage-50) 0%, transparent 60%),
+        var(--jp-cream);
+    border-radius: 1.5rem 0 0 1.5rem;
+    box-shadow: var(--jp-shadow-lg);
+    transform: translateX(100%);
+    transition: transform $drawer-duration var(--jp-ease);
+
+    .menu-drawer[open] & {
+        transform: none;
+    }
+}
+
+.menu-drawer__item {
+    opacity: 0;
+    transform: translateX(1rem);
+    transition:
+        opacity 0.3s,
+        transform $drawer-duration var(--jp-ease);
+
+    .menu-drawer[open] & {
+        opacity: 1;
+        transform: none;
+        transition-delay: calc(0.08s + var(--item-index, 0) * 0.04s);
+    }
+}
+
+.menu-drawer__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1rem;
+    border-radius: 1rem;
+    color: var(--jp-ink);
+    font-size: 1.125rem;
+    font-weight: 550;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    transition: background-color 0.2s;
+
+    svg {
+        color: var(--jp-ink-muted);
+        transition: transform 0.25s var(--jp-ease);
+    }
+
+    &:hover {
+        color: var(--jp-ink);
+        background-color: rgb(63 107 79 / 0.08);
+
+        svg {
+            transform: translateX(3px);
+        }
+    }
+}
+
+// Entry state of the opening animation.
+@starting-style {
+    .menu-drawer[open]::backdrop {
+        background-color: rgb(31 38 34 / 0);
+        backdrop-filter: blur(0);
+    }
+
+    .menu-drawer[open] .menu-drawer__panel {
+        transform: translateX(100%);
+    }
+
+    .menu-drawer[open] .menu-drawer__item {
+        opacity: 0;
+        transform: translateX(1rem);
+    }
+}
+
+// No page scroll behind the open drawer.
+:root:has(.menu-drawer[open]) {
+    overflow: hidden;
+}

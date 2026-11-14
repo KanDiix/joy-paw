@@ -1,15 +1,56 @@
 {
   "layout": {
-    "appName": "FunLand",
+    "appName": "JoyPaw",
+    "homeLink": "JoyPaw, accueil",
+    "skipToContent": "Aller au contenu",
     "mainNavigation": "Navigation principale",
     "nav": {
-      "home": "Accueil",
-      "about": "À propos"
+      "discover": "Découvrir",
+      "owners": "Propriétaires",
+      "professionals": "Professionnels",
+      "resources": "Ressources"
+    },
+    "signIn": "Connexion",
+    "notifyMe": "Être informé du lancement",
+    "menu": {
+      "label": "Menu",
+      "open": "Ouvrir le menu",
+      "close": "Fermer le menu"
     },
     "language": {
       "label": "Langue",
       "en": "English",
       "fr": "Français"
+    },
+    "footer": {
+      "description": "JoyPaw simplifie la recherche et la prise de rendez-vous avec les professionnels du bien-être animal.",
+      "waitlist": {
+        "title": "Soyez parmi les premiers à découvrir JoyPaw",
+        "text": "Rejoignez la liste d'attente et suivez l'évolution du projet."
+      },
+      "discover": {
+        "title": "Découvrir",
+        "about": "À propos",
+        "vision": "Vision",
+        "howItWorks": "Fonctionnement",
+        "resources": "Ressources"
+      },
+      "professionals": {
+        "title": "Professionnels",
+        "trainers": "Éducateurs canins",
+        "behaviourists": "Comportementalistes",
+        "groomers": "Toiletteurs",
+        "osteopaths": "Ostéopathes animaliers",
+        "moreSoon": "Bientôt plus de spécialités"
+      },
+      "legal": {
+        "title": "Légal",
+        "contact": "Contact",
+        "legalNotice": "Mentions légales",
+        "privacy": "Politique de confidentialité"
+      },
+      "copyright": "© JoyPaw",
+      "tribute": "En mémoire de Joy"
     }
   }
 }

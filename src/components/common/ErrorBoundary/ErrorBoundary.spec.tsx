@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ErrorBoundary } from 'components/common/ErrorBoundary';
+import { ErrorBoundary } from 'components/common/ErrorBoundary/ErrorBoundary';
 
 let shouldThrow = true;
 
